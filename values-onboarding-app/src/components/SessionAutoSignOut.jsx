@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase, hasSupabaseEnv } from '../../lib/supabaseClient';
+import { supabase } from '../../lib/supabaseClient';
 
 export default function SessionAutoSignOut() {
   const router = useRouter();
@@ -12,7 +12,7 @@ export default function SessionAutoSignOut() {
 
   async function checkSession() {
       try {
-    if (!hasSupabaseEnv() || !supabase) return;
+  if (!supabase) return;
     const { data } = await supabase.auth.getSession();
         const session = data?.session ?? null;
         if (!session && mounted) {
@@ -45,7 +45,7 @@ export default function SessionAutoSignOut() {
 
     checkSession();
 
-    const subscriptionWrap = hasSupabaseEnv() && supabase
+    const subscriptionWrap = supabase
       ? supabase.auth.onAuthStateChange((_event, session) => {
           if (!session && mounted) router.replace('/');
         })
