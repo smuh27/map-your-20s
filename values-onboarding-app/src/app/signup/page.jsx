@@ -17,7 +17,7 @@ export default function SignupPage() {
     setError("");
     setSuccess("");
     try {
-      const redirectTo = typeof window !== 'undefined' ? `${window.location.origin}/onboarding` : undefined;
+  const redirectTo = `${process.env.NEXT_PUBLIC_SITE_URL || "https://mapyour20s.com"}/onboarding`;
       const { error: otpError } = await supabase.auth.signInWithOtp({
         email: email.trim(),
         options: { emailRedirectTo: redirectTo, shouldCreateUser: true },

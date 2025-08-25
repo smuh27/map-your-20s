@@ -73,12 +73,6 @@ export default function ProfilePage() {
           <span className="font-semibold">Email:</span> {profile?.email || ""}
         </div>
         <button
-          className="w-full bg-blue-600 text-white py-3 rounded mb-4"
-          onClick={() => router.push('/results')}
-        >
-          View Results
-        </button>
-        <button
           className="w-full bg-red-500 text-white py-3 rounded"
           onClick={handleLogout}
         >
