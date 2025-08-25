@@ -1,46 +1,87 @@
 'use client';
 
 import { useEffect } from 'react';
-import { supabase } from '../lib/supabaseClient';
+import { useRouter } from 'next/navigation';
+import { supabase, hasSupabaseEnv } from '../../lib/supabaseClient';
 
 export default function SessionAutoSignOut() {
+  const router = useRouter();
+
   useEffect(() => {
-    const clearLocalSession = () => {
+    let mounted = true;
+
+  async function checkSession() {
       try {
-        localStorage.removeItem('supabase.auth.token');
-        localStorage.removeItem('supabase.auth');
-        localStorage.removeItem('sb:token');
-        // do not remove lastPage intentionally
-      } catch (e) {
-        // ignore
+    if (!hasSupabaseEnv() || !supabase) return;
+    const { data } = await supabase.auth.getSession();
+        const session = data?.session ?? null;
+        if (!session && mounted) {
+          router.replace('/');
+        }
+      } catch (err) {
+        console.error('Session check error:', err);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+      if (userId) {
+        await supabase.from('question_answers').delete().eq('user_id', userId);
+        await supabase.from('profiles').delete().eq('id', userId);
       }
-    };
+    } catch (_) {}
+    try { if (supabase) await supabase.auth.signOut(); } catch (_) {}
+        try {
+          Object.keys(localStorage).forEach((k) => {
+            if (
+              k.startsWith('sb-') ||
+              k.startsWith('supabase') ||
+              k.includes('session') ||
+              k.includes('refresh')
+            ) localStorage.removeItem(k);
+          });
+        } catch (_) {}
+        if (mounted) router.replace('/');
+      }
+    }
 
-    const handleUnload = () => {
+    checkSession();
+
+    const subscriptionWrap = hasSupabaseEnv() && supabase
+      ? supabase.auth.onAuthStateChange((_event, session) => {
+          if (!session && mounted) router.replace('/');
+        })
+      : { data: { subscription: undefined } };
+
+    // Force sign out and data wipe on page unload/leave
+    const handleUnload = async () => {
       try {
-        // best-effort async sign out; do not await because unload may cancel
-        supabase.auth.signOut().catch(() => {});
-      } catch (e) {
-        // ignore
-      } finally {
-        clearLocalSession();
-      }
+        const { data: { session } } = await supabase.auth.getSession();
+        const userId = session?.user?.id;
+        if (userId) {
+          await supabase.from('question_answers').delete().eq('user_id', userId);
+          await supabase.from('profiles').delete().eq('id', userId);
+        }
+        await supabase.auth.signOut();
+        Object.keys(localStorage).forEach((k) => {
+          if (
+            k.startsWith('sb-') ||
+            k.startsWith('supabase') ||
+            k.includes('session') ||
+            k.includes('refresh')
+          ) localStorage.removeItem(k);
+        });
+      } catch (_) {}
     };
-
-    const handleVisibility = () => {
-      if (document.visibilityState === 'hidden') {
-        handleUnload();
-      }
-    };
-
     window.addEventListener('beforeunload', handleUnload);
-    document.addEventListener('visibilitychange', handleVisibility);
-
+    window.addEventListener('unload', handleUnload);
     return () => {
+      mounted = false;
       window.removeEventListener('beforeunload', handleUnload);
-      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('unload', handleUnload);
+      // Clean up subscription if present
+      const subscription = subscriptionWrap?.data?.subscription;
+      if (subscription?.unsubscribe) subscription.unsubscribe();
     };
-  }, []);
+  }, [router]);
 
   return null;
 }

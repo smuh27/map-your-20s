@@ -51,15 +51,41 @@ export default function ResultsPage() {
   };
 
   const handleExportPDF = async () => {
-    // Dynamically import jsPDF
+    // Dynamically import jsPDF and autoTable
     const { jsPDF } = await import("jspdf");
-    const doc = new jsPDF();
-    let y = 10;
-    answers.forEach(({ question_id, answer }, idx) => {
-      doc.text(`${idx + 1}. ${questionMap[question_id]}`, 10, y);
-      y += 8;
-      doc.text(`Answer: ${answer || "(No answer)"}`, 10, y);
-      y += 12;
+    const autoTable = (await import("jspdf-autotable")).default;
+    // Use landscape A4 for more space
+    const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+
+    // Prepare table data
+    const tableData = answers.map(({ question_id, answer }, idx) => [
+      `${idx + 1}. ${questionMap[question_id]}`,
+      answer || "(No answer)"
+    ]);
+
+    let firstPage = true;
+    autoTable(doc, {
+      head: [["Question", "Answer"]],
+      body: tableData,
+      startY: 60,
+      styles: { cellPadding: 8, fontSize: 12, valign: 'top', lineWidth: 0.2 },
+      headStyles: { fillColor: [30, 64, 175], textColor: 255, fontStyle: 'bold', fontSize: 14 },
+      columnStyles: {
+        0: { cellWidth: 350 },
+        1: { cellWidth: 400 },
+      },
+      margin: { left: 30, right: 30 },
+      didDrawPage: (data) => {
+        if (firstPage) {
+          doc.setFontSize(18);
+          doc.setTextColor(30, 64, 175);
+          doc.text("Here are your results!", doc.internal.pageSize.getWidth() / 2, 32, { align: 'center' });
+          firstPage = false;
+        }
+      },
+      theme: 'grid',
+      tableLineColor: [220, 220, 220],
+      tableLineWidth: 0.2,
     });
     doc.save("results.pdf");
   };
@@ -67,26 +93,14 @@ export default function ResultsPage() {
   if (loading) return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-4">
-      <div className="bg-white rounded shadow p-8 w-full max-w-2xl text-black">
-        <h1 className="text-2xl font-bold mb-6 text-center">Your Results</h1>
-        {answers.length === 0 ? (
-          <div>No answers found.</div>
-        ) : (
-          <div className="space-y-6">
-            {answers.map(({ question_id, answer }, idx) => (
-              <div key={question_id} className="mb-4">
-                <div className="font-semibold mb-1">{idx + 1}. {questionMap[question_id]}</div>
-                <div className="ml-2">{answer || <span className="italic text-gray-500">(No answer)</span>}</div>
-              </div>
-            ))}
-          </div>
-        )}
+  <div className="min-h-screen w-full py-8 px-2 flex flex-col items-center">
+      <h1 className="text-3xl font-extrabold mb-8 text-center text-blue-900 drop-shadow">Your Results</h1>
+      <div className="flex flex-col items-center justify-center min-h-[40vh] w-full">
         <button
-          className="w-full bg-blue-600 text-white py-3 rounded mt-8"
-          onClick={handleExportPDF}
+          className="bg-blue-600 text-white py-4 px-8 rounded-lg text-xl font-bold shadow hover:bg-blue-700 transition mx-auto"
+          // onClick handler to show answers modal or page (to be implemented)
         >
-          Export as PDF
+          View your answers
         </button>
       </div>
     </div>

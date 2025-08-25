@@ -33,6 +33,14 @@ export default function ProfilePage() {
   }, [router]);
 
   const handleLogout = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+      if (userId) {
+        await supabase.from('question_answers').delete().eq('user_id', userId);
+        await supabase.from('profiles').delete().eq('id', userId);
+      }
+    } catch (_) {}
     await supabase.auth.signOut();
     router.replace("/login");
   };

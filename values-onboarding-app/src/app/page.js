@@ -26,7 +26,7 @@ export default function RootPage() {
       if (profile.onboarding_complete) {
         router.replace("/countdown");
       } else {
-        router.replace("/home");
+        router.replace("/onboarding");
       }
     };
     redirectUser().then(() => setLoading(false));

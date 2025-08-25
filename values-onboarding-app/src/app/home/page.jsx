@@ -27,13 +27,17 @@ export default function HomePage() {
         .from('profiles')
         .select('onboarding_complete')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       if (profileError) {
         console.error('Error fetching profile:', profileError.message);
         return;
       }
-
+      if (!profile) {
+        // No profile row, send to onboarding
+        router.replace('/onboarding');
+        return;
+      }
       if (profile?.onboarding_complete) {
         setOnboarded(true);
         setLoading(false);

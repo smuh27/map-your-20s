@@ -54,15 +54,17 @@ export default function QuestionsPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const checkSession = async () => {
+    const checkSessionAndWipe = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         router.replace('/login');
         return;
       }
+      // Always delete previous answers for this user
+      await supabase.from('question_answers').delete().eq('user_id', session.user.id);
       setLoading(false);
     };
-    checkSession();
+    checkSessionAndWipe();
   }, [router]);
 
   const handleChange = (e) => {
@@ -96,7 +98,7 @@ export default function QuestionsPage() {
       if (error) {
         alert('Error saving answers: ' + error.message);
       } else {
-        router.push('/results');
+        router.push('/thankyou');
       }
     }
   };
@@ -141,7 +143,7 @@ export default function QuestionsPage() {
             type="submit"
             className="bg-blue-600 text-white py-3 px-6 rounded"
           >
-            {current < allQuestions.length - 1 ? "Next" : "Submit"}
+            {current < allQuestions.length - 1 ? "Next" : "Submit and Download"}
           </button>
         </div>
       </form>
