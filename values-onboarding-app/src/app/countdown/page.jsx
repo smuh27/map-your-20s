@@ -81,8 +81,8 @@ export default function CountdownPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-4 text-center bg-gradient-to-br from-blue-50 to-blue-200">
-      <h1 className="text-5xl font-extrabold mb-4 text-blue-900 drop-shadow">⏳ Map My 20&#39;s</h1>
+  <div className="flex flex-col items-center justify-center min-h-screen px-4 text-center">
+  <h1 className="text-5xl font-extrabold mb-4 text-blue-900 drop-shadow">Map My 20&#39;s</h1>
       <p className="text-lg text-slate-700 mb-6 max-w-xl mx-auto">
         Welcome, and thank you for taking this questionnaire.<br />
         Before we get started, let’s take a moment and step back to look at how much time you have to maximize your potential while being in your 20s.

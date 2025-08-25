@@ -30,7 +30,7 @@ export default function OnboardingPage() {
 
 		return (
 			<div className="flex flex-col items-center justify-center min-h-screen px-4">
-				<form onSubmit={handleSubmit} className="w-full max-w-md space-y-6 bg-white/60 p-6 rounded">
+				<form onSubmit={handleSubmit} className="w-full max-w-md space-y-6 p-8 border border-gray-200 rounded-xl shadow-lg bg-white/80">
 					<h1 className="text-2xl font-bold text-center">Onboarding</h1>
 					<label className="block">
 						<span className="block mb-2 font-medium">First Name</span>
@@ -62,7 +62,7 @@ export default function OnboardingPage() {
 							required
 						/>
 					</label>
-					<button type="submit" className="btn btn-primary w-full" disabled={loading}>
+					<button type="submit" className="w-full py-3 px-4 rounded bg-green-600 text-white font-semibold hover:bg-green-700 transition shadow" disabled={loading}>
 						{loading ? "Saving…" : "Continue"}
 					</button>
 				</form>

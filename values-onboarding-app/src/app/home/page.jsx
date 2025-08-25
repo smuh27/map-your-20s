@@ -78,7 +78,7 @@ export default function HomePage() {
         <h1 className="text-3xl font-bold mb-6 text-center">
           Welcome! Please fill out the form below to set up your profile.
         </h1>
-        <form onSubmit={handleSubmit} className="flex flex-col space-y-4 w-full max-w-sm">
+  <form onSubmit={handleSubmit} className="flex flex-col space-y-4 w-full max-w-sm p-0">
           <input
             type="text"
             placeholder="First Name"
@@ -107,7 +107,7 @@ export default function HomePage() {
           </label>
           <button
             type="submit"
-            className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+            className="bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 transition font-semibold"
           >
             Continue
           </button>

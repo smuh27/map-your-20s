@@ -19,7 +19,7 @@
 @layer base {
   html, body { height: 100%; }
   body {
-    @apply bg-gradient-to-b from-sky-50 via-blue-50 to-white text-slate-800 antialiased;
+    @apply bg-blue-100 text-slate-800 antialiased;
   }
 }
 

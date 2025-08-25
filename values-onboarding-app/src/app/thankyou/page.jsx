@@ -31,7 +31,8 @@ export default function ThankYouPage() {
       (async () => {
         const { jsPDF } = await import("jspdf");
         const autoTable = (await import("jspdf-autotable")).default;
-        const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+  // Use portrait A4 for more vertical space
+  const doc = new jsPDF({ orientation: "portrait", unit: "pt", format: "a4" });
         const questionMap = {
           1: "What have been 3-5 emotionally memorable moments or phases so far in your 20s?",
           2: "Looking back, what do you regret most about how you spent your time and why?",
@@ -57,18 +58,29 @@ export default function ThankYouPage() {
           head: [["Question", "Answer"]],
           body: tableData,
           startY: 60,
-          styles: { cellPadding: 8, fontSize: 12, valign: 'top', lineWidth: 0.2 },
-          headStyles: { fillColor: [30, 64, 175], textColor: 255, fontStyle: 'bold', fontSize: 14 },
+          styles: {
+            cellPadding: 12,
+            fontSize: 13,
+            valign: 'top',
+            lineWidth: 0.2,
+            overflow: 'linebreak',
+            cellWidth: 'wrap',
+            minCellHeight: 30,
+          },
+          headStyles: {
+            fillColor: [30, 64, 175],
+            textColor: 255,
+            fontStyle: 'bold',
+            fontSize: 15,
+            halign: 'center',
+          },
           columnStyles: {
-            0: { cellWidth: 350 },
-            1: { cellWidth: 400 },
+            0: { cellWidth: 180 },
+            1: { cellWidth: 340 },
           },
           margin: { left: 30, right: 30 },
-          didDrawPage: (data) => {
-            doc.setFontSize(18);
-            doc.setTextColor(30, 64, 175);
-            doc.text("Here are your results!", doc.internal.pageSize.getWidth() / 2, 32, { align: 'center' });
-          },
+          // No header
+          didDrawPage: undefined,
           theme: 'grid',
           tableLineColor: [220, 220, 220],
           tableLineWidth: 0.2,
