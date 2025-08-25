@@ -41,12 +41,12 @@ export default function RootLayout({ children }) {
           <SessionAutoSignOut />
           {/* Nav bar with Profile button top right */}
           <div className="w-full flex flex-col items-center mb-2">
-            <div className="text-4xl font-extrabold text-slate-800 tracking-tight mb-2">Map My 20&#39;s</div>
+            <div className="text-4xl font-extrabold text-slate-800 tracking-tight mb-2">Map Your 20s</div>
             <div className="absolute right-0 top-4 mr-8">{showProfile && <ProfileTab />}</div>
           </div>
           <main>{children}</main>
           <footer className="text-sm text-slate-500">
-            © {new Date().getFullYear()} Map My 20&#39;s
+            © {new Date().getFullYear()} Map Your 20s
           </footer>
         </div>
       </body>
